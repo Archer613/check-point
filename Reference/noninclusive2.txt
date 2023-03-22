@@ -1,0 +1,214 @@
+TOPOLOGY:
+
+L3
+└── L2
+    ├── L1
+    └── L1
+
+Total states: 256
+filter: leaf_filter states: 144
+filter: nine_fork_filter states: 63
+filter: global_filter states: 40
+
+TLState.INVALID
+└── TLState.INVALID
+    ├── TLState.INVALID
+    └── TLState.INVALID
+
+TLState.INVALID
+└── TLState.INVALID
+    ├── TLState.INVALID
+    └── TLState.BRANCH
+
+TLState.INVALID
+└── TLState.INVALID
+    ├── TLState.INVALID
+    └── TLState.TIP
+
+TLState.INVALID
+└── TLState.INVALID
+    ├── TLState.BRANCH
+    └── TLState.INVALID
+
+TLState.INVALID
+└── TLState.INVALID
+    ├── TLState.BRANCH
+    └── TLState.BRANCH
+
+TLState.INVALID
+└── TLState.INVALID
+    ├── TLState.TIP
+    └── TLState.INVALID
+
+TLState.INVALID
+└── TLState.BRANCH
+    ├── TLState.INVALID
+    └── TLState.INVALID
+
+TLState.INVALID
+└── TLState.BRANCH
+    ├── TLState.INVALID
+    └── TLState.BRANCH
+
+TLState.INVALID
+└── TLState.BRANCH
+    ├── TLState.BRANCH
+    └── TLState.INVALID
+
+TLState.INVALID
+└── TLState.BRANCH
+    ├── TLState.BRANCH
+    └── TLState.BRANCH
+
+TLState.INVALID
+└── TLState.TRUNK
+    ├── TLState.INVALID
+    └── TLState.TIP
+
+TLState.INVALID
+└── TLState.TRUNK
+    ├── TLState.TIP
+    └── TLState.INVALID
+
+TLState.INVALID
+└── TLState.TIP
+    ├── TLState.INVALID
+    └── TLState.INVALID
+
+TLState.INVALID
+└── TLState.TIP
+    ├── TLState.INVALID
+    └── TLState.BRANCH
+
+TLState.INVALID
+└── TLState.TIP
+    ├── TLState.BRANCH
+    └── TLState.INVALID
+
+TLState.INVALID
+└── TLState.TIP
+    ├── TLState.BRANCH
+    └── TLState.BRANCH
+
+TLState.BRANCH
+└── TLState.INVALID
+    ├── TLState.INVALID
+    └── TLState.INVALID
+
+TLState.BRANCH
+└── TLState.INVALID
+    ├── TLState.INVALID
+    └── TLState.BRANCH
+
+TLState.BRANCH
+└── TLState.INVALID
+    ├── TLState.BRANCH
+    └── TLState.INVALID
+
+TLState.BRANCH
+└── TLState.INVALID
+    ├── TLState.BRANCH
+    └── TLState.BRANCH
+
+TLState.BRANCH
+└── TLState.BRANCH
+    ├── TLState.INVALID
+    └── TLState.INVALID
+
+TLState.BRANCH
+└── TLState.BRANCH
+    ├── TLState.INVALID
+    └── TLState.BRANCH
+
+TLState.BRANCH
+└── TLState.BRANCH
+    ├── TLState.BRANCH
+    └── TLState.INVALID
+
+TLState.BRANCH
+└── TLState.BRANCH
+    ├── TLState.BRANCH
+    └── TLState.BRANCH
+
+TLState.TRUNK
+└── TLState.INVALID
+    ├── TLState.INVALID
+    └── TLState.TIP
+
+TLState.TRUNK
+└── TLState.INVALID
+    ├── TLState.TIP
+    └── TLState.INVALID
+
+TLState.TRUNK
+└── TLState.TRUNK
+    ├── TLState.INVALID
+    └── TLState.TIP
+
+TLState.TRUNK
+└── TLState.TRUNK
+    ├── TLState.TIP
+    └── TLState.INVALID
+
+TLState.TRUNK
+└── TLState.TIP
+    ├── TLState.INVALID
+    └── TLState.INVALID
+
+TLState.TRUNK
+└── TLState.TIP
+    ├── TLState.INVALID
+    └── TLState.BRANCH
+
+TLState.TRUNK
+└── TLState.TIP
+    ├── TLState.BRANCH
+    └── TLState.INVALID
+
+TLState.TRUNK
+└── TLState.TIP
+    ├── TLState.BRANCH
+    └── TLState.BRANCH
+
+TLState.TIP
+└── TLState.INVALID
+    ├── TLState.INVALID
+    └── TLState.INVALID
+
+TLState.TIP
+└── TLState.INVALID
+    ├── TLState.INVALID
+    └── TLState.BRANCH
+
+TLState.TIP
+└── TLState.INVALID
+    ├── TLState.BRANCH
+    └── TLState.INVALID
+
+TLState.TIP
+└── TLState.INVALID
+    ├── TLState.BRANCH
+    └── TLState.BRANCH
+
+TLState.TIP
+└── TLState.BRANCH
+    ├── TLState.INVALID
+    └── TLState.INVALID
+
+TLState.TIP
+└── TLState.BRANCH
+    ├── TLState.INVALID
+    └── TLState.BRANCH
+
+TLState.TIP
+└── TLState.BRANCH
+    ├── TLState.BRANCH
+    └── TLState.INVALID
+
+TLState.TIP
+└── TLState.BRANCH
+    ├── TLState.BRANCH
+    └── TLState.BRANCH
+
+
+Process finished with exit code 0
