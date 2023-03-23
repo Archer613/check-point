@@ -1,12 +1,18 @@
-#include "../include/swap.h"
 #include "stdio.h"
+#include "../include/tltree.h"
+#include <memory>
+
+
 
 int main(int argc, char** argv)
 {
-    swap myswap(10,100);
-    myswap.printInfo();  //打印交换前数值
-    myswap.run( );  //完成数据交换功能
-    myswap.printInfo();
+    Tree::TLTree tltree;
+    tltree.init_tree();
+    tltree.print();
+    
+    tltree.foreach(ID_L3);
+    printf("Total tree = [%ld]\n", tltree.n);
+    
 
     return 0;
 }
