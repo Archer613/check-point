@@ -18,20 +18,19 @@ namespace Tree{
         parent
     */
 
-    class TLTreeNode{
-    private:
-        
+    // Include conntion and state
+    class TLTreeNodeBase{
     public:
         std::set<int> children_id;
         NodeMes self;
         int parent_id;
 
-        TLTreeNode() =default;
+        TLTreeNodeBase() =default;
         void init(int p_id, std::set<int> c_id, NodeMes s){
             this->children_id = c_id;
             this->parent_id = p_id;
             this->self = s;
-            this->self.state = INVALID;// init all state INBALID
+            this->self.state = INVALID;// init all state INVALID
         }
 
         int get_state(void){
@@ -40,19 +39,33 @@ namespace Tree{
     };
 
 
-    class TLTree{
+    class TLTreeNode_L1: public TLTreeNodeBase{
     private:
-        rule rules;
-    public:
-        TLTreeNode Nodes[ID_CACHE_NUM];
-        long int n = 0;
 
+    public:
+
+    };
+    
+    
+
+
+    class TLTree{
+    public:
         TLTree() = default;
 
+        enum{
+            TREE_NUM = 224,
+        };
+        long int n = 0;// tree_num;
+        
         void init_tree(void);
-        void print(void);
+        void print(int *states);
+    private:
+        TLTreeNodeBase Nodes[ID_CACHE_NUM];
+        rule rules;
         void foreach(int cache_id);
         bool check(void);
+        int state_trees[TREE_NUM][ID_CACHE_NUM];
     };
 
 }

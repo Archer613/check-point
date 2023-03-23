@@ -45,17 +45,21 @@ namespace Tree{
             self.id = ID_L3;
             Nodes[ID_L3].init(ID_NONE, c_id, self);
             c_id.clear();
+
+            
+            // get all legal state_trees
+            foreach(ID_L3);
         }
 
 
 
 
-    void TLTree::print(void){
+    void TLTree::print(int *states){
         std::string s[ID_CACHE_NUM];
 
         for (size_t i = 0; i < ID_CACHE_NUM; i++)
         {
-            s[i] = Tool::stateTostring(Nodes[i].get_state());
+            s[i] = Tool::stateTostring(states[i]);
         }
 
         printf("\n[%s]-[%s]   [%s]-[%s]\n"  , s[0].c_str(), s[1].c_str(), s[2].c_str(), s[3].c_str() );
@@ -73,8 +77,12 @@ namespace Tree{
             if(cache_id == 0){
                 // check rules
                 if(check()){
-                    print();
-                    n++;
+                    for (size_t i = 0; i < ID_CACHE_NUM; i++)
+                    {
+                        state_trees[n][i] = Nodes[i].get_state();
+                    }
+                    print(state_trees[n]);
+                    n++;   
                 }
             }else if(cache_id > 0){
                 foreach(next_cache_id);
