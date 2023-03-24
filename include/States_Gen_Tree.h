@@ -17,6 +17,7 @@ public:
         TREE_NUM = 224,
     };
     long int n = 0;// tree_num;
+    int state_trees[TREE_NUM][ID_CACHE_NUM];
     
     void init_tree(void);
     void print(int *states);
@@ -25,7 +26,7 @@ private:
     rule rules;
     void foreach(int cache_id);
     bool check(void);
-    int state_trees[TREE_NUM][ID_CACHE_NUM];
+    
 };
 
 

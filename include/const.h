@@ -53,6 +53,7 @@ enum {
     ID_CORE0_L1_NUM = 2,
     ID_CORE1_L1_NUM = 2,
     ID_L1_NUM = ID_CORE0_L1_NUM + ID_CORE1_L1_NUM,
+    ID_L2_NUM = 2,
 };
 
 
