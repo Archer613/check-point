@@ -2,7 +2,7 @@
 #define CHECK_POINT_RULE_H
 
 #include "const.h"
-#include "common.h"
+#include "NodeBase.h"
 #include "Tool.h"
 
 class rule{

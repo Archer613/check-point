@@ -3,6 +3,7 @@
 
 #include <string>
 #include "const.h"
+#include <cassert>
 
 namespace Tool{
 
@@ -29,6 +30,16 @@ namespace Tool{
             break;
         }
         return s;
+    }
+
+    static void cp_assert(bool b, string s){
+        if(b == false){
+            printf("\nERROR: %s\n", s.c_str());
+            assert(b == false);
+        }
+
+        return;
+
     }
 
 
