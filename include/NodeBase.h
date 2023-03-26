@@ -24,6 +24,8 @@ public:
     int valid;
     // input/output node id
     int id;
+    // source
+    int src_id;
 
     bool operator<(const TLMes& value) const{
         return id < value.id;

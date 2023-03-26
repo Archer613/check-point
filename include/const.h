@@ -9,19 +9,26 @@ enum {
   LogicalData,
   Get,
   Hint,
-  AcquireBlock,
-  AcquirePerm
+  AcquireBlock,//6
+  AcquirePerm//7
 };
-enum { Probe = 6 };
+enum { 
+  // Probe = 6 
+  Probe = 8 // Reordering
+};
 enum {
   AccessAck = 0,
   AccessAckData,
   HintAck,
   ProbeAck = 4,
   ProbeAckData,
-  Release,
-  ReleaseData
+  // Release, //5
+  // ReleaseData //6 
+  Release = 9, // Reordering
+  ReleaseData= 10 // Reordering
 };
+
+
 enum { Grant = 4, GrantData, ReleaseAck };
 enum { GrantAck = 0 };
 
@@ -39,6 +46,7 @@ enum { INCLUSIVE = 0, NONINCLUSIVE };
 
 
 // ID
+// ID be storage by set ,rule is D$ < I$, CORE0 < CORE1
 enum {
     ID_NONE = -1,
     ID_CORE0_DCACHE = 0,
@@ -54,6 +62,8 @@ enum {
     ID_CORE1_L1_NUM = 2,
     ID_L1_NUM = ID_CORE0_L1_NUM + ID_CORE1_L1_NUM,
     ID_L2_NUM = 2,
+
+    ID_FORK_NUM_MAX = 2,
 };
 
 
