@@ -15,7 +15,7 @@ void tl_tree::init(){
     for (int i = ID_CORE0_L1_NUM; i < ID_CORE0_L1_NUM + ID_CORE1_L1_NUM; i++)
     {
         self.id = i;
-        node_l1[i].init(ID_CORE0_L2, c_id, self);
+        node_l1[i].init(ID_CORE1_L2, c_id, self);
         c_id.clear();
     }
 
@@ -41,16 +41,55 @@ void tl_tree::init(){
     c_id.clear();
 }
 
+
+void tl_tree::get_all_states(){
+    for (int id = 0; id < ID_CACHE_NUM; id++)
+    {
+        if(id < ID_L1_NUM){
+            states_new[id] = node_l1[id].self.state;
+        }else if(id < ID_L1_NUM + ID_L2_NUM){
+            states_new[id] = node_l2[id-ID_L1_NUM].self.state;
+        }else{
+            states_new[id] = node_l3.self.state;
+        }
+    }
+    
+            
+}
+
+
 bool tl_tree::run(int op, int param, int *s, int id){
     std::set<TLMes> mes_in;
     std::set<TLMes> mes_temp;
     std::set<TLMes> mes_out;
     bool has_mes_valid = true;
-    
+
+    // update states
+    for (int i = 0; i < ID_CACHE_NUM; i++)
+    {
+        if(i < ID_L1_NUM){
+            node_l1[i].up_states(s);
+            node_l1[i].reset();
+        }else if(i < ID_L1_NUM + ID_L2_NUM){
+            node_l2[i-ID_L1_NUM].up_states(s);
+            node_l2[i-ID_L1_NUM].reset();
+        }else{
+            node_l3.up_states(s);
+            node_l3.reset();
+        }
+    }
+
     // input first
-    node_l1[id].up_states(s);
     mes_in = node_l1[id].control(op, param);
-    printf("scr_id_:%d id:%d op:%d, param:%d pe:%d valid:%d\n", mes_in.begin()->src_id, mes_in.begin()->id, mes_in.begin()->opcode, mes_in.begin()->param
+    if(!mes_in.begin()->valid){
+        printf("Ilegal input!\n");
+    }else{
+        printf("legal input:\n");
+    }
+    printf("[%s]->[%s] [%s %s] pe[%d] va[%d]\n", Tool::idTostring(mes_in.begin()->src_id).c_str()
+                                            , Tool::idTostring(mes_in.begin()->id).c_str()
+                                            , Tool::opTostring(mes_in.begin()->opcode).c_str()
+                                            , Tool::paramTostring(mes_in.begin()->opcode, mes_in.begin()->param).c_str()
                                             , mes_in.begin()->perfercache, mes_in.begin()->valid);
 
     // run
@@ -70,7 +109,10 @@ bool tl_tree::run(int op, int param, int *s, int id){
                 if(it_temp->valid && it_temp->id != ID_NONE)
                     has_mes_valid = true;
                 mes_out.insert(*it_temp);
-                printf("scr_id_:%d id:%d op:%d, param:%d pe:%d valid:%d\n", it_temp->src_id, it_temp->id, it_temp->opcode, it_temp->param
+                printf("[%s]->[%s] [%s %s] pe[%d] va[%d]\n", Tool::idTostring(it_temp->src_id).c_str()
+                                            , Tool::idTostring(it_temp->id).c_str()
+                                            , Tool::opTostring(it_temp->opcode).c_str()
+                                            , Tool::paramTostring(it_temp->opcode, it_temp->param).c_str()
                                             , it_temp->perfercache, it_temp->valid);
             }
             mes_temp.clear();
@@ -79,4 +121,11 @@ bool tl_tree::run(int op, int param, int *s, int id){
         mes_out.clear();
     } 
 
+    // get states
+    get_all_states();
+    Tool::print(s);
+    Tool::print(states_new);
+    printf("\n--------------------------------\n");
+
+    return false;
 }

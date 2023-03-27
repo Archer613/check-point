@@ -12,6 +12,7 @@ private:
 
 public:
     tl_tree() = default;
+    int states_new[ID_CACHE_NUM];
 
     void init();
     void get_all_states();

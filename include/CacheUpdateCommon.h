@@ -4,6 +4,11 @@
 #include "const.h"
 #include "Tool.h"
 
+
+
+
+
+
 //-------------------------------Base Tool-------------------------//
 
 static bool req_is_UL(int op){
@@ -25,7 +30,7 @@ static bool req_is_UL(int op){
             L3
 */
 // return : fork_num
-static int get_fork_max_states(int *fork, int *states, int id, bool except_id){
+static int get_fork_max_states(int *fork, int *states, int id, int except_id){
     int fork_num = 0;
     // L1
     if (id == ID_CORE0_ICACHE || id == ID_CORE0_DCACHE || id == ID_CORE1_ICACHE || id == ID_CORE1_DCACHE){
@@ -83,7 +88,7 @@ static int get_fork_max_states(int *fork, int *states, int id, bool except_id){
     return -1;
 }
 
-static bool fork_max_states_is_invalid(int *states, int id, bool except_id){
+static bool fork_max_states_is_invalid(int *states, int id, int except_id){
     // get fork states
     bool fork_is_invalid = true;
     int fork[ID_FORK_NUM_MAX];
@@ -119,54 +124,102 @@ static bool needT(int op, int param){
     if(req_is_UL(op) && op != Get){
         flag = true;
     }else if((op == AcquireBlock || op == AcquirePerm) && (param == NtoT || param == BtoT)){
-        flag == true;
+        flag = true;
     }
     return flag;
 }
 
-static bool gotT(int *states){
-    int n = 0;
-    for (int i = 0; i < ID_CACHE_NUM; i++)
-    {
-        if (states[i] == TIP)
-            n++;
-    }
-    if(n == 0){
-        return true;
-    }else{
-        return false;
-    }
-}
+//-------------------------------promoteT model-------------------------//
 
-static bool promoteT(int *states, int id){
-    // get fork states
-    bool fork_is_invalid = true;
-    int fork[ID_FORK_NUM_MAX];
-    int fork_num = get_fork_max_states(fork, states, id, ID_NONE);
-    for (int i = 0; i < fork_num; i++)
-    {
-        if(fork[i] != INVALID)
-            fork_is_invalid = false;
+// acquireBlock NtoB
+static bool promoteT_model(int *states, int id){
+    int core;
+    if(id < ID_CORE0_L1_NUM || id == ID_CORE0_L2){
+        core = 0;
+    }else if(id < ID_CORE0_L1_NUM + ID_CORE1_L1_NUM || id == ID_CORE1_L2){
+        core = 1;
     }
+
+
+    bool l2_gotT = false;
+    bool l2_promoteT = false;
+    bool l3_gotT = false;
+    bool l3_promoteT = false;
     
-    // rule
-    bool flag = false;
-    if(states[id] != INVALID){
-        if(states[id] == TIP && fork_is_invalid){
-            flag = true;
+    // l3 need acquire down
+    if(fork_max_states_is_invalid(states, ID_L3, ID_NONE) && states[ID_L3] == INVALID){
+        l3_gotT = true;
+    }
+
+    // l3
+    if(states[ID_L3] != INVALID){
+        if(states[ID_L3] == TIP && fork_max_states_is_invalid(states, ID_L3, ID_NONE)){
+            l3_promoteT = true;
         }
     }else{
-        // if(gotT)
+        if(l3_gotT && promoteT_safe){
+            l3_promoteT = true;
+        }
     }
+
+    // l2 need acquire down
+    int ID_L2 = ID_L1_NUM + core;
+    if(fork_max_states_is_invalid(states, ID_L2, ID_NONE) && states[ID_L2] == INVALID){
+        l2_gotT = l3_promoteT;
+    }
+
+    // l2
+    if(states[ID_L2] != INVALID){
+        if(states[ID_L2] == TIP && fork_max_states_is_invalid(states, ID_L2, ID_NONE)){
+            l2_promoteT = true;
+        }
+    }else{
+        if(l2_gotT && promoteT_safe){
+            l2_promoteT = true;
+        }
+    }
+
+    // return 
+    if(id >= 0){
+        if(id < ID_L1_NUM){
+            return l2_promoteT;
+        }else if(id < ID_L1_NUM + ID_L2_NUM){
+            return l3_promoteT;
+        }else{
+            Tool::cp_assert(false, "promoteT_model ilegal id");
+        }
+    }
+    return false;
 }
 
+static bool gotT(int *states, bool grant, int id){
+    if(!grant || id == ID_NONE)
+        return false;
+
+    bool flag = false;
+    if(id < ID_L1_NUM){
+        flag = promoteT_model(states, id);
+    }else if(id == ID_CORE0_L2 || id == ID_CORE1_L2){
+        // judg l3 promoteT to L2
+        flag =  promoteT_model(states, id);
+    }else if(id == ID_L3)
+    {
+        flag = true;
+    }
+
+    return flag;
+}
 
 //-------------------------------State Update Rules-------------------------//
 
 //TODO: only support op == acquire*
-static int req_a_next_state(int *states ,int id, int op, int param){
-    if(op != AcquireBlock || op != AcquirePerm)
-        Tool::cp_assert(false, "req_a_next_state: ilegaa op");
+static int req_a_next_state(int *states ,int id, int op, int param, bool grant){
+    if(op == AcquireBlock || op == AcquirePerm){
+        // go on
+    }else{
+        Tool::cp_assert(false, "req_a_next_state: ilegal op");
+    }
+        
     
     int next_state = INVALID;
     // needT
@@ -179,11 +232,30 @@ static int req_a_next_state(int *states ,int id, int op, int param){
     }
     // no needT
     else{
-        // self == INVALID
-        // if(){
-
-        // }
+        if(states[id] == INVALID){
+            if(gotT(states, grant, id)){
+                if(promoteT_safe && (op == AcquireBlock || op == AcquirePerm)){
+                    next_state = TRUNK;
+                }else{
+                    next_state = TIP;
+                }
+            }else{
+                next_state = BRANCH;
+            }
+        }else if(states[id] == BRANCH){
+            next_state = BRANCH;
+        }else if(states[id] == TRUNK){
+            next_state = TIP;
+        }else if(states[id] == TIP){
+            if(fork_max_states_is_invalid(states, id, ID_NONE) && (op == AcquireBlock || op == AcquirePerm)){
+                next_state = TRUNK;
+            }else{
+                next_state = TIP;
+            }
+        }
     }
+
+    return next_state;
 }
 
 
@@ -207,17 +279,37 @@ static int probe_next_state(int state, int param){
             break;
         case BRANCH:
             switch(param){
-                case toT: Tool::cp_assert(false,"ilegal param"); break;
+                case toT: next_state = BRANCH; break;
                 case toB: next_state = BRANCH; break;
                 case toN: next_state = INVALID; break;
             }
             break;
         case INVALID:
             switch(param){
-                case toT: Tool::cp_assert(false,"ilegal param"); break;
-                case toB: Tool::cp_assert(false,"ilegal param"); break;
+                case toT: next_state = INVALID; break;
+                case toB: next_state = INVALID; break;
                 case toN: next_state = INVALID; break;
             }
+            break;
+        default: Tool::cp_assert(false,"ilegal state"); break;
+    }
+
+    return next_state;
+}
+
+
+static int release_next_state(int state, int param){
+    int next_state;
+
+    switch(param){
+        case TtoT: next_state = TRUNK; break;
+        case TtoB: next_state = TIP; break;
+        case TtoN: next_state = TIP; break;
+        case BtoN: 
+            if(state == TIP)
+                next_state = TIP; 
+            else if(state != TIP)
+                next_state =BRANCH;
             break;
         default: Tool::cp_assert(false,"ilegal state"); break;
     }

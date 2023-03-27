@@ -34,7 +34,6 @@ void TLTreeNode_L1::up_states(int *s){
         states[i] = s[i];
     }
 
-    reset();
 }
 
 // handle
@@ -49,12 +48,36 @@ void TLTreeNode_L1::handle(TLMes in){
 
 // control
 std::set<TLMes> TLTreeNode_L1::control(int op, int param){
+    // Input legality check
+    bool legal = false;
+    if(op == AcquireBlock || op == AcquirePerm){
+        switch(param){
+            case NtoB: if(states[self.id] == INVALID) legal = true; break;
+            case NtoT: if(states[self.id] == INVALID) legal = true; break;
+            case BtoT: if(states[self.id] == BRANCH) legal = true; break;
+            default: Tool::cp_assert(false, "control ilegal param");
+        }
+    }else if(op == Release || op == ReleaseData){
+        switch(param){
+            case TtoN: if(states[self.id] == TIP) legal = true; break;
+            case BtoN: if(states[self.id] == BRANCH) legal = true; break;
+            default: Tool::cp_assert(false, "control ilegal param");
+        }
+    }   
+
     // update self state
     int self_next_state;
     if(op == AcquireBlock || op == AcquirePerm){
         switch(param){
-            case toT: self_next_state = TIP; break;
-            case toB:  break; // TODO
+            case NtoT: self_next_state = TIP; break;
+            case NtoB: 
+                if(promoteT_model(states, self.id)){
+                    self_next_state = TIP;
+                }else{
+                    self_next_state = BRANCH;
+                }
+                break;
+            case BtoT: self_next_state = TIP; break;
             default: Tool::cp_assert(false,"control legal param");
         }
     }else if(op == ReleaseData){
@@ -66,14 +89,15 @@ std::set<TLMes> TLTreeNode_L1::control(int op, int param){
     }else{
         Tool::cp_assert(false,"first_mes ilegal opcode");
     }
-    self.state = self_next_state;
+    if(legal)
+        self.state = self_next_state;
 
     // mes_out
     TLMes first_mes;
     first_mes.opcode = op;
     first_mes.param = param;
     first_mes.perfercache = (self.id == ID_CORE0_ICACHE || self.id == ID_CORE1_ICACHE);
-    first_mes.valid = true;
+    first_mes.valid = legal;
     first_mes.id = parent_id;
     first_mes.src_id = self.id;
     mes_out.insert(first_mes);
@@ -99,7 +123,10 @@ void TLTreeNode_L2L3::input(TLMes in){
 void TLTreeNode_L2L3::output(){
     // releaseData
     if(mes_in.opcode == ReleaseData){
-        // nothing to do
+        // nothing to output
+
+        // wb_dir
+        wb_dir = true;
     }
     // probe
     else if(mes_in.opcode == Probe){
@@ -124,20 +151,35 @@ void TLTreeNode_L2L3::output(){
                 }  
             }
         }
+
+        // wb_dir
+        if(states[self.id] != INVALID && (mes_in.param == toN || (states[self.id] == TIP && mes_in.param == toB))){
+            wb_dir = true;
+        }
     }
     // accquire*
     else if(mes_in.opcode == AcquireBlock || mes_in.opcode == AcquirePerm){
-        // acquire down
+        // probe up
         if(needT(mes_in.opcode, mes_in.param) && fork_states_no_more_than_TIP(states, self.id, mes_in.src_id)){
             TLMes mes_be_sent = mes_in;
             mes_be_sent.id = parent_id;
             mes_be_sent.src_id = self.id;
             mes_out.insert(mes_be_sent);
+            grant = true;
+            // wb_dir
+            if(mes_in.perfercache || (states[self.id] != INVALID && mes_in.opcode != Get)){
+                wb_dir = true;
+            }
         }else if(!needT(mes_in.opcode, mes_in.param) && fork_max_states_is_invalid(states, self.id, mes_in.src_id) && states[self.id] == INVALID){
             TLMes mes_be_sent = mes_in;
             mes_be_sent.id = parent_id;
             mes_be_sent.src_id = self.id;
             mes_out.insert(mes_be_sent);
+            grant = true;
+            // probe up wb_dir
+            if(mes_in.perfercache || (states[self.id] != INVALID && mes_in.opcode != Get)){
+                wb_dir = true;
+            }
         }
         // probe up
         if(!fork_max_states_is_invalid(states, self.id, mes_in.src_id)){
@@ -158,6 +200,17 @@ void TLTreeNode_L2L3::output(){
                         mes_out.insert(mes_be_sent);
                     }
                 }
+                // probe up wb_dir
+                if(states[self.id] == INVALID)
+                    wb_dir = true;
+            }
+        }
+        // receive acquire* wb_dir
+        if(mes_in.perfercache || states[self.id] != INVALID){
+            if(mes_in.opcode == AcquireBlock){
+                wb_dir = true;
+            }else if(mes_in.opcode == AcquirePerm && states[self.id] != INVALID){
+                wb_dir = true;
             }
         }
     }else{
@@ -165,16 +218,30 @@ void TLTreeNode_L2L3::output(){
     }
 }
 
-// void TLTreeNode_L1::up_self(){
-//     switch(mes_in.opcode){
-//         case AcquireBlock: 
-//     }
-// }
+void TLTreeNode_L2L3::up_self(){
+    if(wb_dir){
+        switch(mes_in.opcode){
+            // Channel A
+            case AcquireBlock: self.state = req_a_next_state(states,self.id,mes_in.opcode,mes_in.param,grant); break;
+            case AcquirePerm: self.state = req_a_next_state(states,self.id,mes_in.opcode,mes_in.param,grant); break;
+            // Channel B
+            case Probe: self.state = probe_next_state(states[self.id],mes_in.param); break;
+            // Channel C
+            case ReleaseData: self.state = release_next_state(states[self.id],mes_in.param); break;
+            default: Tool::cp_assert(false, "up_self ilegal op");
+        }
+    }else{
+        // no change self state
+    }
+
+}
 
 void TLTreeNode_L2L3::reset(){
     mes_in.valid = false;
     mes_out.clear();
     self.state = states[self.id];
+    grant = false;
+    wb_dir = false;
 }
 
 // up_states
@@ -185,7 +252,6 @@ void TLTreeNode_L2L3::up_states(int *s){
         states[i] = s[i];
     }
 
-    reset();
 }
 
 // handle
@@ -195,8 +261,8 @@ std::set<TLMes> TLTreeNode_L2L3::handle(TLMes in){
 
     output();
 
-    return mes_out;
+    up_self();    
 
-    // up_self();    
+    return mes_out;
 
 }

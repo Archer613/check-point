@@ -10,12 +10,12 @@ class TLTreeNode_L1: public TLTreeNodeBase{
 private:
   void input(TLMes in);
   void up_self();// update self
-  void reset();
   TLMes mes_in;
   std::set<TLMes> mes_out;
 public:
   void node_init(int p_id, std::set<int> c_id, NodeMes s);
   void up_states(int *s); // update all
+  void reset();
   void handle(TLMes in);
   std::set<TLMes> control(int op, int param);
 };
@@ -38,12 +38,14 @@ private:
   void input(TLMes in);
   void up_self();// update self
   void output();
-  void reset();
   TLMes mes_in;
   std::set<TLMes> mes_out;
+  bool grant;
+  bool wb_dir;
 public:
   void node_init(int p_id, std::set<int> c_id, NodeMes s);
   void up_states(int *s); // update all
+  void reset();
   std::set<TLMes> handle(TLMes in);
 };
 

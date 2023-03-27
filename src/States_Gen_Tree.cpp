@@ -49,18 +49,7 @@ void States_Gen_Tree::init_tree(void){
 
 
 
-void States_Gen_Tree::print(int *states){
-    std::string s[ID_CACHE_NUM];
 
-    for (size_t i = 0; i < ID_CACHE_NUM; i++)
-    {
-        s[i] = Tool::stateTostring(states[i]);
-    }
-
-    printf("\n[%s]-[%s]   [%s]-[%s]\n"  , s[0].c_str(), s[1].c_str(), s[2].c_str(), s[3].c_str() );
-    printf("  [%s]       [%s]\n"      , s[4].c_str(), s[5].c_str());
-    printf("       [%s]\n"            , s[6].c_str());
-}
 
 
 void States_Gen_Tree::foreach(int cache_id){
@@ -76,7 +65,7 @@ void States_Gen_Tree::foreach(int cache_id){
                 {
                     state_trees[n][i] = Nodes[i].self.state;
                 }
-                print(state_trees[n]);
+                // Tool::print(state_trees[n]);
                 n++;   
             }
         }else if(cache_id > 0){

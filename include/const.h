@@ -43,6 +43,7 @@ enum { INVALID = 0, BRANCH, TRUNK, TIP };
 // Others
 enum { CLEAN = 0, DIRTY };
 enum { INCLUSIVE = 0, NONINCLUSIVE };
+enum { promoteT_safe = true };
 
 
 // ID
