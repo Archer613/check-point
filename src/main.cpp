@@ -17,26 +17,29 @@ int main(int argc, char** argv)
     // TODO: support TL-UL
     tl_tree model;
     model.init();
-    for (int n = 0; n < states_gen.n; n++)
-    {
-        // acquireBlock
-        model.run( AcquireBlock, NtoB, states_gen.state_trees[n], ID_CORE0_ICACHE);
-        model.run( AcquireBlock, NtoB, states_gen.state_trees[n], ID_CORE1_ICACHE);
-        for (int param = NtoB; param <= BtoT; param++)
-        {
-            model.run( AcquireBlock, param, states_gen.state_trees[n], ID_CORE0_DCACHE);
-            model.run( AcquireBlock, param, states_gen.state_trees[n], ID_CORE1_DCACHE);
-        }   
+    // for (int n = 0; n < states_gen.n; n++)
+    // {
+    //     // acquireBlock
+    //     model.run( AcquireBlock, NtoB, states_gen.state_trees[n], ID_CORE0_ICACHE);
+    //     model.run( AcquireBlock, NtoB, states_gen.state_trees[n], ID_CORE1_ICACHE);
+    //     for (int param = NtoB; param <= BtoT; param++)
+    //     {
+    //         model.run( AcquireBlock, param, states_gen.state_trees[n], ID_CORE0_DCACHE);
+    //         model.run( AcquireBlock, param, states_gen.state_trees[n], ID_CORE1_DCACHE);
+    //     }   
 
-        // releaseData
-        for (int param = TtoN; param <= BtoN; param++)
-        {
-            for (int cache = 0; cache < ID_L1_NUM; cache++)
-            {
-                 model.run( ReleaseData, param, states_gen.state_trees[n], cache);
-            }
-        }
-    }
+    //     // releaseData
+    //     for (int param = TtoN; param <= BtoN; param++)
+    //     {
+    //         for (int cache = 0; cache < ID_L1_NUM; cache++)
+    //         {
+    //              model.run( ReleaseData, param, states_gen.state_trees[n], cache);
+    //         }
+    //     }
+    // }
+
+    // TODO: Test TL_UL Probe
+    model.run(Get, 0, states_gen.state_trees[36], ID_DMA);
     
 
 

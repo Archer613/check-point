@@ -49,6 +49,7 @@ enum { promoteT_safe = true };
 // ID
 // ID be storage by set ,rule is D$ < I$, CORE0 < CORE1
 enum {
+    // Cache
     ID_NONE = -1,
     ID_CORE0_DCACHE = 0,
     ID_CORE0_ICACHE = 1,
@@ -57,14 +58,22 @@ enum {
     ID_CORE0_L2 = 4,
     ID_CORE1_L2 = 5,
     ID_L3 = 6,
+    // Cache num
     ID_CACHE_NUM,
-
     ID_CORE0_L1_NUM = 2,
     ID_CORE1_L1_NUM = 2,
     ID_L1_NUM = ID_CORE0_L1_NUM + ID_CORE1_L1_NUM,
     ID_L2_NUM = 2,
-
+    // Cache fork
     ID_FORK_NUM_MAX = 2,
+
+    // TL-UL: PTW DMA
+    ID_CORE0_PTW = 7,
+    ID_CORE1_PTW,
+    ID_DMA,
+    // num
+    ID_PTW_NUM = 2,
+    ID_UL_NUM = 3,
 };
 
 

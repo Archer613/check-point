@@ -4,6 +4,14 @@
 #include "const.h"
 #include "Tool.h"
 
+class TLTreeNode_UL: public TLTreeNodeBase{
+private:
+  std::set<TLMes> mes_out;
+public:
+  void node_init(int p_id, std::set<int> c_id, NodeMes s);
+  void reset();
+  std::set<TLMes> control(int op);
+};
 
 
 class TLTreeNode_L1: public TLTreeNodeBase{

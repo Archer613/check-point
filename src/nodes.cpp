@@ -1,5 +1,34 @@
 #include "../include/nodes.h"
 
+//-------------------------TL_UL_NODES-----------------------//
+
+void TLTreeNode_UL::node_init(int p_id, std::set<int> c_id, NodeMes s){
+    // init NodeBase
+    init(p_id, c_id, s);
+}
+
+void TLTreeNode_UL::reset(){
+    mes_out.clear();
+}
+
+// control
+std::set<TLMes> TLTreeNode_UL::control(int op){
+    // Input legality check
+    bool legal = req_is_UL(op);  
+
+    // mes_out
+    TLMes first_mes;
+    first_mes.opcode = op;
+    first_mes.param = 0;
+    first_mes.perfercache = false;
+    first_mes.valid = legal;
+    first_mes.id = parent_id;
+    first_mes.src_id = self.id;
+    mes_out.insert(first_mes);
+    return mes_out;
+}
+
+
 //-------------------------L1_NODES-----------------------//
 
 void TLTreeNode_L1::node_init(int p_id, std::set<int> c_id, NodeMes s){
@@ -114,8 +143,20 @@ void TLTreeNode_L2L3::node_init(int p_id, std::set<int> c_id, NodeMes s){
 }
 
 void TLTreeNode_L2L3::input(TLMes in){
-    if(in.valid && !req_is_UL(in.opcode) && in.opcode != Release)
+    if(in.valid && in.opcode != Release){
         mes_in = in;
+
+        // handle perferCache
+        if(self.id != ID_L3){ //L2
+            mes_in.perfercache = mes_in.perfercache;
+        }else{//L3
+            if(mes_in.opcode == Get || mes_in.opcode == PutFullData || mes_in.opcode == PutPartialData){
+                mes_in.perfercache = true;
+            }else{
+                mes_in.perfercache = mes_in.perfercache;
+            }
+        }
+    }
     else    
         Tool::cp_assert(false,"L2/L3 ilegal input");
 }
@@ -124,7 +165,6 @@ void TLTreeNode_L2L3::output(){
     // releaseData
     if(mes_in.opcode == ReleaseData){
         // nothing to output
-
         // wb_dir
         wb_dir = true;
     }
@@ -159,24 +199,15 @@ void TLTreeNode_L2L3::output(){
     }
     // accquire*
     else if(mes_in.opcode == AcquireBlock || mes_in.opcode == AcquirePerm){
-        // probe up
-        if(needT(mes_in.opcode, mes_in.param) && fork_states_no_more_than_TIP(states, self.id, mes_in.src_id)){
+        // acquire down
+        if((needT(mes_in.opcode, mes_in.param) && fork_states_no_more_than_TIP(states, self.id, mes_in.src_id && states[self.id] != TIP)) // condition 1
+            || (!needT(mes_in.opcode, mes_in.param) && fork_max_states_is_invalid(states, self.id, mes_in.src_id) && states[self.id] == INVALID)){// condition 2
             TLMes mes_be_sent = mes_in;
             mes_be_sent.id = parent_id;
             mes_be_sent.src_id = self.id;
             mes_out.insert(mes_be_sent);
             grant = true;
             // wb_dir
-            if(mes_in.perfercache || (states[self.id] != INVALID && mes_in.opcode != Get)){
-                wb_dir = true;
-            }
-        }else if(!needT(mes_in.opcode, mes_in.param) && fork_max_states_is_invalid(states, self.id, mes_in.src_id) && states[self.id] == INVALID){
-            TLMes mes_be_sent = mes_in;
-            mes_be_sent.id = parent_id;
-            mes_be_sent.src_id = self.id;
-            mes_out.insert(mes_be_sent);
-            grant = true;
-            // probe up wb_dir
             if(mes_in.perfercache || (states[self.id] != INVALID && mes_in.opcode != Get)){
                 wb_dir = true;
             }
@@ -211,6 +242,48 @@ void TLTreeNode_L2L3::output(){
                 wb_dir = true;
             }else if(mes_in.opcode == AcquirePerm && states[self.id] != INVALID){
                 wb_dir = true;
+            }
+        }
+    // Get Put*
+    }else if(mes_in.opcode == Get || mes_in.opcode == PutFullData || mes_in.opcode == PutPartialData){
+        // req down
+        if((needT(mes_in.opcode, mes_in.param) && fork_states_no_more_than_TIP(states, self.id, ID_NONE) && states[self.id] != TIP) // condition 1
+            || (!needT(mes_in.opcode, mes_in.param) && fork_max_states_is_invalid(states, self.id, ID_NONE) && states[self.id] == INVALID)){// condition 2
+            
+            // TODO
+            Tool::cp_assert(false, "TODO");
+
+            // wb_dir
+            if(mes_in.perfercache || (states[self.id] != INVALID && mes_in.opcode != Get)){
+                wb_dir = true;
+            }
+        }
+        // probe up
+        if(!fork_max_states_is_invalid(states, self.id, ID_NONE)){
+            if(!fork_states_no_more_than_TIP(states, self.id, ID_NONE) || states[self.id] == INVALID || (mes_in.opcode == PutFullData || mes_in.opcode == PutPartialData)){
+                TLMes mes_be_sent;
+                mes_be_sent.opcode = Probe;
+                if(needT(mes_in.opcode, mes_in.param)){
+                    mes_be_sent.param = toN;
+                }else{
+                    mes_be_sent.param = toB;
+                }
+                mes_be_sent.perfercache = false;
+                mes_be_sent.src_id = self.id;
+                mes_be_sent.valid = true;
+                // judge which cache should be probe
+                int fork[ID_FORK_NUM_MAX];
+                get_fork_max_states(fork, states, self.id, ID_NONE);
+                int i = 0;
+                for(std::set<int>::iterator it = children_id.begin(); it != children_id.end(); it++){
+                    if(fork[i++] != INVALID){
+                        mes_be_sent.id = *it;
+                        mes_out.insert(mes_be_sent);
+                    }
+                }
+                // probe up wb_dir
+                if(states[self.id] == INVALID || states[self.id] != INVALID)
+                    wb_dir = true;
             }
         }
     }else{

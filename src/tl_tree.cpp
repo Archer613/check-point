@@ -39,6 +39,22 @@ void tl_tree::init(){
     self.id = ID_L3;
     node_l3.init(ID_NONE, c_id, self);
     c_id.clear();
+
+    //----------- UL -------------//   
+    // PTW CORE0
+    self.id = ID_CORE0_PTW;
+    node_ul[0].init(ID_CORE0_L2, c_id, self);
+    c_id.clear();
+    // PTW CORE1
+    self.id = ID_CORE1_PTW;
+    node_ul[1].init(ID_CORE1_L2, c_id, self);
+    c_id.clear();
+    // DMA
+    self.id = ID_DMA;
+    node_ul[2].init(ID_L3, c_id, self);
+    c_id.clear();
+    
+
 }
 
 
@@ -78,9 +94,19 @@ bool tl_tree::run(int op, int param, int *s, int id){
             node_l3.reset();
         }
     }
+    for (int id = ID_CACHE_NUM; id < ID_CACHE_NUM + ID_UL_NUM; id++)
+    {
+        node_ul[id-ID_CACHE_NUM].reset();
+    }
+    
 
     // input first
-    mes_in = node_l1[id].control(op, param);
+    if(!req_is_UL(op)){
+        mes_in = node_l1[id].control(op, param);
+    }else{
+        mes_in = node_ul[id-ID_CACHE_NUM].control(op);
+    }
+
     if(!mes_in.begin()->valid){
         printf("Ilegal input!\n");
     }else{

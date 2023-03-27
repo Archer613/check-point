@@ -9,6 +9,7 @@ private:
     TLTreeNode_L1 node_l1[ID_L1_NUM];
     TLTreeNode_L2L3 node_l2[ID_L2_NUM];
     TLTreeNode_L2L3 node_l3;
+    TLTreeNode_UL node_ul[ID_UL_NUM];
 
 public:
     tl_tree() = default;

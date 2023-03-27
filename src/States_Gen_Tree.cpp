@@ -47,11 +47,6 @@ void States_Gen_Tree::init_tree(void){
     }
 
 
-
-
-
-
-
 void States_Gen_Tree::foreach(int cache_id){
     int next_cache_id = cache_id-1;
     for (int state = INVALID; state <= TIP; state++)
