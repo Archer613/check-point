@@ -22,8 +22,8 @@ enum {
   HintAck,
   ProbeAck = 4,
   ProbeAckData,
-  // Release, //5
-  // ReleaseData //6 
+  // Release, //6
+  // ReleaseData //7 
   Release = 9, // Reordering
   ReleaseData= 10 // Reordering
 };
@@ -76,6 +76,14 @@ enum {
     ID_UL_NUM = 3,
 };
 
+// channel
+enum {
+  CHNLA = 0,
+  CHNLB,
+  CHNLC,
+  CHNLD,
+  CHNLE,
+};
 
 // level
 enum{

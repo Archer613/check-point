@@ -132,6 +132,78 @@ namespace Tool{
         printf("       [%s]\n"            , s[6].c_str());
     }
 
+    static int opToChnl(int op){
+        if(op <= AcquirePerm)
+            return CHNLA;
+        else if(op <= Probe)
+            return CHNLB;
+        else if(op <= ReleaseData)
+            return CHNLC;
+        
+        cp_assert(false, "opToChnl ilegal op");
+        return -1;
+    }
+
+    static int opToTLop(int op){
+        if(op <= AcquirePerm)
+            return op;
+        else if(op <= Probe)
+            return (op-2);
+        else if(op <= ReleaseData)
+            return (op-3);
+
+        cp_assert(false, "opToTLop ilegal op");
+        return -1;
+    }
+
+    static int idToTLid(int id){
+        enum{
+            DCACHE_BUS_TYPE = 0,
+            ICACHE_BUS_TYPE = 1,
+            TILE_BUS_TYPE = 2,
+            L3_BUS_TYPE = 3,
+            DMA_BUS_TYPE = 4,
+            PTW_BUS_TYPE = 5,
+        };
+        switch(id){
+            case ID_NONE: cp_assert(false, "idToTLid ilegal id"); break;
+            case ID_CORE0_DCACHE: return DCACHE_BUS_TYPE;
+            case ID_CORE0_ICACHE: return ICACHE_BUS_TYPE;
+            case ID_CORE1_DCACHE: return DCACHE_BUS_TYPE;
+            case ID_CORE1_ICACHE: return ICACHE_BUS_TYPE;
+            case ID_CORE0_L2: return TILE_BUS_TYPE;
+            case ID_CORE1_L2: return TILE_BUS_TYPE;
+            case ID_L3: return L3_BUS_TYPE;
+            case ID_DMA: return DMA_BUS_TYPE;
+            case ID_CORE0_PTW: return PTW_BUS_TYPE;
+            case ID_CORE1_PTW: return PTW_BUS_TYPE;
+            default: cp_assert(false, "idToTLid ilegal id"); break;
+        }
+        return -1;
+    }
+
+    static int idToCore(int id){
+        enum{
+            CORE0 = 0,
+            CORE1,
+        };
+        switch(id){
+            case ID_NONE: cp_assert(false, "idToCore ilegal id"); break;
+            case ID_CORE0_DCACHE: return CORE0;
+            case ID_CORE0_ICACHE: return CORE0;
+            case ID_CORE1_DCACHE: return CORE1;
+            case ID_CORE1_ICACHE: return CORE1;
+            case ID_CORE0_L2: return CORE0;
+            case ID_CORE1_L2: return CORE1;
+            case ID_L3: return 0;
+            case ID_DMA: return 0;
+            case ID_CORE0_PTW: return CORE0;
+            case ID_CORE1_PTW: return CORE1;
+            default: cp_assert(false, "idToCore ilegal id"); break;
+        }
+        return -1;
+    }
+
 
 }
 #endif

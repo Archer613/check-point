@@ -18,6 +18,8 @@ public:
     void init();
     void get_all_states();
     bool run(int op, int param, int *s, int id);
+
+    long int num;
 };
 
 #endif
