@@ -182,6 +182,7 @@ void TLTreeNode_L2L3::output(){
                     if(fork[i] != INVALID){
                         // set_probe
                         TLMes mes_be_sent = mes_in;
+                        mes_be_sent.src_id = self.id;
                         std::set<int>::iterator it = children_id.begin();
                         for (int j = 0; j < i; j++)
                             it++;
@@ -193,7 +194,7 @@ void TLTreeNode_L2L3::output(){
         }
 
         // wb_dir
-        if(states[self.id] != INVALID && (mes_in.param == toN || (states[self.id] == TIP && mes_in.param == toB))){
+        if(states[self.id] != INVALID && (mes_in.param == toN || (states[self.id] > BRANCH && mes_in.param == toB))){
             wb_dir = true;
         }
     }
@@ -295,6 +296,9 @@ void TLTreeNode_L2L3::up_self(){
     if(wb_dir){
         switch(mes_in.opcode){
             // Channel A
+            case PutFullData: break; // TODO
+            case PutPartialData: break; // TODO
+            case Get: break; // TODO
             case AcquireBlock: self.state = req_a_next_state(states,self.id,mes_in.opcode,mes_in.param,grant); break;
             case AcquirePerm: self.state = req_a_next_state(states,self.id,mes_in.opcode,mes_in.param,grant); break;
             // Channel B

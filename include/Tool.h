@@ -53,6 +53,9 @@ namespace Tool{
             case ID_CORE0_L2: s = "C0 L2"; break;
             case ID_CORE1_L2: s = "C1 L2"; break;
             case ID_L3: s = "L3"; break;
+            case ID_CORE0_PTW: s = "ID_CORE0_PTW"; break;
+            case ID_CORE1_PTW: s = "ID_CORE1_PTW"; break;
+            case ID_DMA: s = "ID_DMA"; break;
             default: cp_assert(false, "ilegal id");
         }
         return s;
@@ -61,6 +64,9 @@ namespace Tool{
     static string opTostring(uint8_t op){
         string s;
         switch(op){
+            case PutFullData: s = "PutFullData"; break;
+            case PutPartialData: s = "PutPartialData"; break;
+            case Get: s = "Get"; break;
             case AcquireBlock: s = "AcquireBlock"; break;
             case AcquirePerm: s = "AcquirePerm"; break;
             case Probe: s = "Probe"; break;
@@ -101,18 +107,18 @@ namespace Tool{
             case Release: 
                 switch(param){
                     case TtoN: s = "TtoN"; break; 
-                    case BtoN: s = "TtoB"; break; 
+                    case BtoN: s = "BtoN"; break; 
                     default: cp_assert(false, "ilegal param");
                 }
                 break;
             case ReleaseData:
                 switch(param){
                     case TtoN: s = "TtoN"; break; 
-                    case BtoN: s = "TtoB"; break; 
+                    case BtoN: s = "BtoN"; break; 
                     default: cp_assert(false, "ilegal param");
                 }
                 break;
-            default: cp_assert(false, "ilegal opcode");
+            default: s = "0";
         }
         return s;
     }
@@ -125,8 +131,6 @@ namespace Tool{
             s[i] = stateTostring(states[i]);
         }
 
-        static int num = 0;
-        printf("\nNUM[%d]:\n",num++);
         printf("[%s]-[%s]   [%s]-[%s]\n"  , s[0].c_str(), s[1].c_str(), s[2].c_str(), s[3].c_str() );
         printf("  [%s]       [%s]\n"      , s[4].c_str(), s[5].c_str());
         printf("       [%s]\n"            , s[6].c_str());
