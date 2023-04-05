@@ -83,6 +83,7 @@ bool tl_tree::run(int op, int param, int *s, int id){
     bool has_mes_valid = true;
     bool first_mes_legal = false;
     static long int total_num = 0;
+    bool mode = true;
 
     // update states
     for (int i = 0; i < ID_CACHE_NUM; i++)
@@ -111,29 +112,33 @@ bool tl_tree::run(int op, int param, int *s, int id){
         mes_in = node_ul[id-ID_CACHE_NUM].control(op);
     }
 
-    // printf("NUM: %ld\n", total_num);
+    if(!mode) HLOG("NUM: %ld\n", total_num);
     total_num++;
     if(!mes_in.begin()->valid){
-        // printf("Ilegal input!\n");
+        if(!mode) HLOG("Ilegal input!\n\n");
+        first_mes_legal = false;
     }else{
-        // printf("legal input:\n");
+        if(!mode) HLOG("legal input:\n\n");
         first_mes_legal = true;
         num++;
         // print output
-        printf("%d  %d  %d  %d  %d\n", Tool::opToChnl(op), Tool::opToTLop(op), param, Tool::idToTLid(id), Tool::idToCore(id));// chnl op param src core
-        for (int i = 0; i < ID_CACHE_NUM; i++)
-        {
-            printf("%d  ", s[i]);
-        }
-        printf("\n"); 
+        if(mode){
+            HLOG("%d  %d  %d  %d  %d\n", Tool::opToChnl(op), Tool::opToTLop(op), param, Tool::idToTLid(id), Tool::idToCore(id));// chnl op param src core
+            for (int i = 0; i < ID_CACHE_NUM; i++)
+            {
+                HLOG("%d  ", s[i]);
+            }
+            HLOG("\n"); 
+        }   
     }
     
-    // printf("[%s]->[%s] [%s %s] pe[%d] va[%d]\n", Tool::idTostring(mes_in.begin()->src_id).c_str()
-    //                                         , Tool::idTostring(mes_in.begin()->id).c_str()
-    //                                         , Tool::opTostring(mes_in.begin()->opcode).c_str()
-    //                                         , Tool::paramTostring(mes_in.begin()->opcode, mes_in.begin()->param).c_str()
-    //                                         , mes_in.begin()->perfercache, mes_in.begin()->valid);
-
+    if(first_mes_legal && !mode){
+        HLOG("[%s]->[%s] [%s %s] pe[%d] va[%d]\n", Tool::idTostring(mes_in.begin()->src_id).c_str()
+                                                , Tool::idTostring(mes_in.begin()->id).c_str()
+                                                , Tool::opTostring(mes_in.begin()->opcode).c_str()
+                                                , Tool::paramTostring(mes_in.begin()->opcode, mes_in.begin()->param).c_str()
+                                                , mes_in.begin()->perfercache, mes_in.begin()->valid);
+    }
 
     // run
     while(has_mes_valid){
@@ -152,11 +157,13 @@ bool tl_tree::run(int op, int param, int *s, int id){
                 if(it_temp->valid && it_temp->id != ID_NONE)
                     has_mes_valid = true;
                 mes_out.insert(*it_temp);
-                // printf("[%s]->[%s] [%s %s] pe[%d] va[%d]\n", Tool::idTostring(it_temp->src_id).c_str()
-                //                             , Tool::idTostring(it_temp->id).c_str()
-                //                             , Tool::opTostring(it_temp->opcode).c_str()
-                //                             , Tool::paramTostring(it_temp->opcode, it_temp->param).c_str()
-                //                             , it_temp->perfercache, it_temp->valid);
+                if(first_mes_legal && !mode){
+                    HLOG("[%s]->[%s] [%s %s] pe[%d] va[%d]\n", Tool::idTostring(it_temp->src_id).c_str()
+                                                , Tool::idTostring(it_temp->id).c_str()
+                                                , Tool::opTostring(it_temp->opcode).c_str()
+                                                , Tool::paramTostring(it_temp->opcode, it_temp->param).c_str()
+                                                , it_temp->perfercache, it_temp->valid);
+                }
             }
             mes_temp.clear();
         }
@@ -166,17 +173,20 @@ bool tl_tree::run(int op, int param, int *s, int id){
 
     // get states
     get_all_states();
-    // Tool::print(s);
-    // Tool::print(states_new);
-    // printf("\n--------------------------------\n");
+    if(first_mes_legal && !mode){
+        Tool::print(s);
+        Tool::print(states_new);
+        HLOG("\n--------------------------------\n");
+    }
+    
 
     // print output
-    if(first_mes_legal){
+    if(first_mes_legal && mode){
         for (int i = 0; i < ID_CACHE_NUM; i++)
         {
-            printf("%d  ", states_new[i]);
+            HLOG("%d  ", states_new[i]);
         }
-        printf("\n"); 
+        HLOG("\n"); 
     }
     
 

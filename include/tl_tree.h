@@ -2,7 +2,7 @@
 #define CHECK_POINT_TL_TREE_H
 
 #include "nodes.h"
-
+#include "Common.h"
 
 class tl_tree{
 private:

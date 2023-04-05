@@ -6,7 +6,7 @@
 #include "Tool.h"
 #include "string.h"
 #include "rule.h"
-
+#include "Common.h"
 
 
 class States_Gen_Tree{

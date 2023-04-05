@@ -3,6 +3,7 @@
 #include <memory>
 #include "nodes.h"
 #include "tl_tree.h"
+#include "Common.h"
 
 
 
@@ -11,7 +12,7 @@ int main(int argc, char** argv)
     // Get all legal state_trees
     States_Gen_Tree states_gen;
     states_gen.init_tree();
-    printf("Total tree = [%ld]\n", states_gen.n);
+    HLOG("Total tree = [%ld]\n", states_gen.n);
     
     // Only ideal cases are considered, no request nesting, all block is clean
     // TODO: support TL-UL
@@ -44,12 +45,10 @@ int main(int argc, char** argv)
             }
         }
     }
-    printf("Total legal trans = [%ld]\n", model.num);
+    HLOG("Total legal trans = [%ld]\n", model.num);
 
     // TODO: Test TL_UL Probe
     // model.run(PutFullData, 0, states_gen.state_trees[7], ID_DMA);
-    
-
 
     return 0;
 }

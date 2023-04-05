@@ -4,6 +4,7 @@
 #include "const.h"
 #include "NodeBase.h"
 #include "Tool.h"
+#include "Common.h"
 
 class rule{
 private:

@@ -4,6 +4,7 @@
 #include <set>
 #include "const.h"
 #include "CacheUpdateCommon.h"
+#include "Common.h"
 
 class NodeMes{
 public:

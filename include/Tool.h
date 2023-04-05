@@ -4,6 +4,7 @@
 #include <string>
 #include "const.h"
 #include <cassert>
+#include "Common.h"
 
 namespace Tool{
 
@@ -34,7 +35,7 @@ namespace Tool{
 
     static void cp_assert(bool b, string s){
         if(b == false){
-            printf("\nERROR: %s\n", s.c_str());
+            HLOG("\nERROR: %s\n", s.c_str());
         }
         assert(b == true);
 
@@ -131,9 +132,9 @@ namespace Tool{
             s[i] = stateTostring(states[i]);
         }
 
-        printf("[%s]-[%s]   [%s]-[%s]\n"  , s[0].c_str(), s[1].c_str(), s[2].c_str(), s[3].c_str() );
-        printf("  [%s]       [%s]\n"      , s[4].c_str(), s[5].c_str());
-        printf("       [%s]\n"            , s[6].c_str());
+        HLOG("[%s]-[%s]   [%s]-[%s]\n"  , s[0].c_str(), s[1].c_str(), s[2].c_str(), s[3].c_str() );
+        HLOG("  [%s]       [%s]\n"      , s[4].c_str(), s[5].c_str());
+        HLOG("       [%s]\n"            , s[6].c_str());
     }
 
     static int opToChnl(int op){

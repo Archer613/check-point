@@ -3,6 +3,7 @@
 #include "NodeBase.h"
 #include "const.h"
 #include "Tool.h"
+#include "Common.h"
 
 class TLTreeNode_UL: public TLTreeNodeBase{
 private:
