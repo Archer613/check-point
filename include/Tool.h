@@ -35,7 +35,7 @@ namespace Tool{
 
     static void cp_assert(bool b, string s){
         if(b == false){
-            HLOG("\nERROR: %s\n", s.c_str());
+            HLOG(true, "\nERROR: %s\n", s.c_str());
         }
         assert(b == true);
 
@@ -132,9 +132,9 @@ namespace Tool{
             s[i] = stateTostring(states[i]);
         }
 
-        HLOG("[%s]-[%s]   [%s]-[%s]\n"  , s[0].c_str(), s[1].c_str(), s[2].c_str(), s[3].c_str() );
-        HLOG("  [%s]       [%s]\n"      , s[4].c_str(), s[5].c_str());
-        HLOG("       [%s]\n"            , s[6].c_str());
+        HLOG(true, "[%s]-[%s]   [%s]-[%s]\n"  , s[0].c_str(), s[1].c_str(), s[2].c_str(), s[3].c_str() );
+        HLOG(true, "  [%s]       [%s]\n"      , s[4].c_str(), s[5].c_str());
+        HLOG(true, "       [%s]\n"            , s[6].c_str());
     }
 
     static int opToChnl(int op){

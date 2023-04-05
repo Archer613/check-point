@@ -5,9 +5,9 @@
 #define __HLOG__  
 
 #ifdef __HLOG__  
-#define HLOG(format,...) printf(format, ##__VA_ARGS__)
+#define HLOG(sw,format,...) if(sw) printf(format, ##__VA_ARGS__)
 #else  
-#define HLOG(format,...)  
+#define HLOG(sw,format,...)  
 #endif  
 
 

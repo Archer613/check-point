@@ -112,28 +112,28 @@ bool tl_tree::run(int op, int param, int *s, int id){
         mes_in = node_ul[id-ID_CACHE_NUM].control(op);
     }
 
-    if(!mode) HLOG("NUM: %ld\n", total_num);
+    if(!mode) HLOG(true, "NUM: %ld\n", total_num);
     total_num++;
     if(!mes_in.begin()->valid){
-        if(!mode) HLOG("Ilegal input!\n\n");
+        if(!mode) HLOG(true, "Ilegal input!\n\n");
         first_mes_legal = false;
     }else{
-        if(!mode) HLOG("legal input:\n\n");
+        if(!mode) HLOG(true, "legal input:\n\n");
         first_mes_legal = true;
         num++;
         // print output
         if(mode){
-            HLOG("%d  %d  %d  %d  %d\n", Tool::opToChnl(op), Tool::opToTLop(op), param, Tool::idToTLid(id), Tool::idToCore(id));// chnl op param src core
+            HLOG(true, "%d  %d  %d  %d  %d\n", Tool::opToChnl(op), Tool::opToTLop(op), param, Tool::idToTLid(id), Tool::idToCore(id));// chnl op param src core
             for (int i = 0; i < ID_CACHE_NUM; i++)
             {
-                HLOG("%d  ", s[i]);
+                HLOG(true, "%d  ", s[i]);
             }
-            HLOG("\n"); 
+            HLOG(true, "\n"); 
         }   
     }
     
     if(first_mes_legal && !mode){
-        HLOG("[%s]->[%s] [%s %s] pe[%d] va[%d]\n", Tool::idTostring(mes_in.begin()->src_id).c_str()
+        HLOG(true, "[%s]->[%s] [%s %s] pe[%d] va[%d]\n", Tool::idTostring(mes_in.begin()->src_id).c_str()
                                                 , Tool::idTostring(mes_in.begin()->id).c_str()
                                                 , Tool::opTostring(mes_in.begin()->opcode).c_str()
                                                 , Tool::paramTostring(mes_in.begin()->opcode, mes_in.begin()->param).c_str()
@@ -158,7 +158,7 @@ bool tl_tree::run(int op, int param, int *s, int id){
                     has_mes_valid = true;
                 mes_out.insert(*it_temp);
                 if(first_mes_legal && !mode){
-                    HLOG("[%s]->[%s] [%s %s] pe[%d] va[%d]\n", Tool::idTostring(it_temp->src_id).c_str()
+                    HLOG(true, "[%s]->[%s] [%s %s] pe[%d] va[%d]\n", Tool::idTostring(it_temp->src_id).c_str()
                                                 , Tool::idTostring(it_temp->id).c_str()
                                                 , Tool::opTostring(it_temp->opcode).c_str()
                                                 , Tool::paramTostring(it_temp->opcode, it_temp->param).c_str()
@@ -176,7 +176,7 @@ bool tl_tree::run(int op, int param, int *s, int id){
     if(first_mes_legal && !mode){
         Tool::print(s);
         Tool::print(states_new);
-        HLOG("\n--------------------------------\n");
+        HLOG(true, "\n--------------------------------\n");
     }
     
 
@@ -184,9 +184,9 @@ bool tl_tree::run(int op, int param, int *s, int id){
     if(first_mes_legal && mode){
         for (int i = 0; i < ID_CACHE_NUM; i++)
         {
-            HLOG("%d  ", states_new[i]);
+            HLOG(true, "%d  ", states_new[i]);
         }
-        HLOG("\n"); 
+        HLOG(true, "\n"); 
     }
     
 
