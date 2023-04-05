@@ -206,6 +206,7 @@ void TLTreeNode_L2L3::output(){
             TLMes mes_be_sent = mes_in;
             mes_be_sent.id = parent_id;
             mes_be_sent.src_id = self.id;
+            mes_be_sent.perfercache = false;
             mes_out.insert(mes_be_sent);
             grant = true;
             // wb_dir
@@ -299,8 +300,8 @@ void TLTreeNode_L2L3::up_self(){
             case PutFullData: break; // TODO
             case PutPartialData: break; // TODO
             case Get: break; // TODO
-            case AcquireBlock: self.state = req_a_next_state(states,self.id,mes_in.opcode,mes_in.param,grant); break;
-            case AcquirePerm: self.state = req_a_next_state(states,self.id,mes_in.opcode,mes_in.param,grant); break;
+            case AcquireBlock: self.state = req_a_next_state(states,self.id,mes_in.opcode,mes_in.param,grant, mes_in.src_id); break;
+            case AcquirePerm: self.state = req_a_next_state(states,self.id,mes_in.opcode,mes_in.param,grant, mes_in.src_id); break;
             // Channel B
             case Probe: self.state = probe_next_state(states[self.id],mes_in.param); break;
             // Channel C

@@ -213,7 +213,7 @@ static bool gotT(int *states, bool grant, int id){
 //-------------------------------State Update Rules-------------------------//
 
 //TODO: only support op == acquire*
-static int req_a_next_state(int *states ,int id, int op, int param, bool grant){
+static int req_a_next_state(int *states ,int id, int op, int param, bool grant, int src_id){
     if(op == AcquireBlock || op == AcquirePerm){
         // go on
     }else{
@@ -240,7 +240,10 @@ static int req_a_next_state(int *states ,int id, int op, int param, bool grant){
                     next_state = TIP;
                 }
             }else{
-                next_state = BRANCH;
+                if(!fork_states_no_more_than_TIP(states, id, src_id))
+                    next_state = TIP;
+                else
+                    next_state = BRANCH;
             }
         }else if(states[id] == BRANCH){
             next_state = BRANCH;

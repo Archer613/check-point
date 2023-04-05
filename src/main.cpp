@@ -17,37 +17,37 @@ int main(int argc, char** argv)
     // TODO: support TL-UL
     tl_tree model;
     model.init();
-    // for (int n = 0; n < states_gen.n; n++)
-    // {
-    //     // acquirePerm
-    //     for (int param = NtoT; param <= BtoT; param++)
-    //     {
-    //         model.run( AcquirePerm, param, states_gen.state_trees[n], ID_CORE0_DCACHE);
-    //         model.run( AcquirePerm, param, states_gen.state_trees[n], ID_CORE1_DCACHE);
-    //     }  
+    for (int n = 0; n < states_gen.n; n++)
+    {
+        // acquirePerm
+        for (int param = NtoT; param <= BtoT; param++)
+        {
+            model.run( AcquirePerm, param, states_gen.state_trees[n], ID_CORE0_DCACHE);
+            model.run( AcquirePerm, param, states_gen.state_trees[n], ID_CORE1_DCACHE);
+        }  
         
-    //     // acquireBlock
-    //     model.run( AcquireBlock, NtoB, states_gen.state_trees[n], ID_CORE0_ICACHE);
-    //     model.run( AcquireBlock, NtoB, states_gen.state_trees[n], ID_CORE1_ICACHE);
-    //     for (int param = NtoB; param <= BtoT; param++)
-    //     {
-    //         model.run( AcquireBlock, param, states_gen.state_trees[n], ID_CORE0_DCACHE);
-    //         model.run( AcquireBlock, param, states_gen.state_trees[n], ID_CORE1_DCACHE);
-    //     }   
+        // acquireBlock
+        model.run( AcquireBlock, NtoB, states_gen.state_trees[n], ID_CORE0_ICACHE);
+        model.run( AcquireBlock, NtoB, states_gen.state_trees[n], ID_CORE1_ICACHE);
+        for (int param = NtoB; param <= BtoT; param++)
+        {
+            model.run( AcquireBlock, param, states_gen.state_trees[n], ID_CORE0_DCACHE);
+            model.run( AcquireBlock, param, states_gen.state_trees[n], ID_CORE1_DCACHE);
+        }   
 
-    //     // releaseData
-    //     for (int param = TtoN; param <= BtoN; param++)
-    //     {
-    //         for (int cache = 0; cache < ID_L1_NUM; cache++)
-    //         {
-    //              model.run( ReleaseData, param, states_gen.state_trees[n], cache);
-    //         }
-    //     }
-    // }
-    // printf("Total legal trans = [%ld]\n", model.num);
+        // releaseData
+        for (int param = TtoN; param <= BtoN; param++)
+        {
+            for (int cache = 0; cache < ID_L1_NUM; cache++)
+            {
+                 model.run( ReleaseData, param, states_gen.state_trees[n], cache);
+            }
+        }
+    }
+    printf("Total legal trans = [%ld]\n", model.num);
 
     // TODO: Test TL_UL Probe
-    // model.run(PutFullData, 0, states_gen.state_trees[1883], ID_DMA);
+    // model.run(PutFullData, 0, states_gen.state_trees[7], ID_DMA);
     
 
 
