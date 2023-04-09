@@ -72,7 +72,27 @@ void tl_tree::get_all_states(){
         }
     }
     
-            
+}
+
+void tl_tree::get_DIR_all_states(int *s){
+    // for CORE0_L2 CORE1_L2 L3
+    for (int id = ID_CORE0_L2; id <= ID_L3; id++)
+    {
+        int dir_id = id - ID_CORE0_L2;
+
+        int fork[ID_FORK_NUM_MAX];
+        int fork_max_states = get_fork_max_states(fork, s, id, ID_NONE);
+        if(fork[0] == TRUNK || fork[1] == TRUNK)
+            Tool::cp_assert(false,"fork max states cant be trunk");
+
+        self_dir[dir_id][0] = s[id];
+        self_dir[dir_id][1] = fork[0];
+        self_dir[dir_id][2] = fork[1];
+
+        client_dir[dir_id][0] = fork[0];
+        client_dir[dir_id][1] = fork[1];
+    }
+    
 }
 
 
@@ -81,9 +101,9 @@ bool tl_tree::run(int op, int param, int *s, int id){
     std::set<TLMes> mes_temp;
     std::set<TLMes> mes_out;
     bool has_mes_valid = true;
-    bool first_mes_legal = false;
+    bool first_mes_legal = true;
     static long int total_num = 0;
-    bool mode = true;
+    static bool mode = true;
 
     // update states
     for (int i = 0; i < ID_CACHE_NUM; i++)
@@ -123,12 +143,15 @@ bool tl_tree::run(int op, int param, int *s, int id){
         num++;
         // print output
         if(mode){
-            HLOG(true, "%d  %d  %d  %d  %d\n", Tool::opToChnl(op), Tool::opToTLop(op), param, Tool::idToTLid(id), Tool::idToCore(id));// chnl op param src core
-            for (int i = 0; i < ID_CACHE_NUM; i++)
-            {
-                HLOG(true, "%d  ", s[i]);
-            }
-            HLOG(true, "\n"); 
+            // HLOG(true, "%d  %d  %d  %d  %d\n", Tool::opToChnl(op), Tool::opToTLop(op), param, Tool::idToTLid(id), Tool::idToCore(id));// chnl op param src core
+            // for (int i = 0; i < ID_CACHE_NUM; i++)
+            // {
+            //     HLOG(true, "%d  ", s[i]);
+            // }
+            // HLOG(true, "\n");
+
+            // test case
+            HLOG(true, "%d %d %d %d %d\n", Tool::idToTLid(id), Tool::idToCore(id), Tool::opToChnl(op), Tool::opToTLop(op), param);
         }   
     }
     
@@ -176,19 +199,48 @@ bool tl_tree::run(int op, int param, int *s, int id){
     if(first_mes_legal && !mode){
         Tool::print(s);
         Tool::print(states_new);
-        HLOG(true, "\n--------------------------------\n");
     }
-    
+
+    // get all states
+    // Self DIR : self client0 client1
+    // Client DIR : client0 client1
+    get_DIR_all_states(s);
+    if(first_mes_legal && !mode){
+        for (int id = ID_CORE0_L2; id <= ID_L3; id++)
+        {
+            int dir_id = id - ID_CORE0_L2;
+
+            // printf Self Dir
+            HLOG(true, "cache[%s]:\n Self DIR: [%s] [%s] [%s]\n", Tool::idTostring(id).c_str()
+                                                                , Tool::stateTostring(self_dir[dir_id][0]).c_str()
+                                                                , Tool::stateTostring(self_dir[dir_id][1]).c_str()
+                                                                , Tool::stateTostring(self_dir[dir_id][2]).c_str());
+
+            // printf Client Dir
+            HLOG(true, " Client DIR: [%s] [%s]\n", Tool::stateTostring(client_dir[dir_id][0]).c_str()
+                                                , Tool::stateTostring(client_dir[dir_id][1]).c_str());
+        }
+    }
+    if(!mode) HLOG(true, "\n--------------------------------\n");
 
     // print output
     if(first_mes_legal && mode){
-        for (int i = 0; i < ID_CACHE_NUM; i++)
+        // states
+        // for (int i = 0; i < ID_CACHE_NUM; i++)
+        // {
+        //     HLOG(true, "%d  ", states_new[i]);
+        // }
+        // HLOG(true, "\n");
+        
+        // testcase DIR 
+        for (int id = ID_CORE0_L2; id <= ID_L3; id++)
         {
-            HLOG(true, "%d  ", states_new[i]);
+            int dir_id = id - ID_CORE0_L2;
+            HLOG(true, "%d %d %d ", self_dir[dir_id][0], self_dir[dir_id][1], self_dir[dir_id][2]);
+            HLOG(true, "%d %d\n", client_dir[dir_id][0], client_dir[dir_id][1]);
         }
-        HLOG(true, "\n"); 
+        
     }
-    
 
     return false;
 }

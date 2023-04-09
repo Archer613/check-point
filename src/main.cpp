@@ -21,7 +21,7 @@ int main(int argc, char** argv)
     for (int n = 0; n < states_gen.n; n++)
     {
         // acquirePerm
-        for (int param = NtoT; param <= BtoT; param++)
+        for (int param = NtoT; param <= NtoT; param++)
         {
             model.run( AcquirePerm, param, states_gen.state_trees[n], ID_CORE0_DCACHE);
             model.run( AcquirePerm, param, states_gen.state_trees[n], ID_CORE1_DCACHE);
