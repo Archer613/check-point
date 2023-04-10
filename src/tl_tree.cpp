@@ -143,6 +143,7 @@ bool tl_tree::run(int op, int param, int *s, int id){
         num++;
         // print output
         if(mode){
+            // states
             // HLOG(true, "%d  %d  %d  %d  %d\n", Tool::opToChnl(op), Tool::opToTLop(op), param, Tool::idToTLid(id), Tool::idToCore(id));// chnl op param src core
             // for (int i = 0; i < ID_CACHE_NUM; i++)
             // {
@@ -239,6 +240,16 @@ bool tl_tree::run(int op, int param, int *s, int id){
             HLOG(true, "%d %d %d ", self_dir[dir_id][0], self_dir[dir_id][1], self_dir[dir_id][2]);
             HLOG(true, "%d %d\n", client_dir[dir_id][0], client_dir[dir_id][1]);
         }
+        for (int i = 0; i < ID_CACHE_NUM; i++)
+        {
+            HLOG(true, "%d ", s[i]);
+        }
+        HLOG(true, "\n");
+        for (int i = 0; i < ID_CACHE_NUM; i++)
+        {
+            HLOG(true, "%d ", states_new[i]);
+        }
+        HLOG(true, "\n");
         
     }
 
